@@ -1,28 +1,61 @@
 /**
- * Site configuration (no .env required).
+ * Site configuration.
  *
- * SHOPIFY_CATALOG_SOURCE:
- * - `admin-proxy` — Product grids use the Admin API via the Vite dev server (`npm run dev`).
- *   Same token as Postman: set `SHOPIFY_ADMIN_ACCESS_TOKEN` in `server/shopify-settings.mjs` or `.env`.
- * - `storefront` — Grids use Storefront GraphQL; set SHOPIFY_STOREFRONT_ACCESS_TOKEN (not shpat).
+ * Netlify / production: set `VITE_*` variables in Netlify → Site configuration → Environment variables,
+ * then trigger a new deploy. Values are inlined at build time by Vite.
+ *
+ * Local: copy `.env.example` to `.env` (never commit `.env`).
+ *
+ * SHOPIFY_CATALOG_SOURCE (via `VITE_SHOPIFY_CATALOG_SOURCE`):
+ * - `storefront` (default) — Storefront GraphQL in the browser. Requires `VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN`.
+ * - `admin-proxy` — Local only with `npm run dev`; Vite serves `/api/shopify/catalog/*`. Static hosts have no proxy.
  */
-export const SHOPIFY_CATALOG_SOURCE = 'admin-proxy';
+function viteEnv(key, fallback = '') {
+  try {
+    const v = import.meta.env?.[key];
+    if (v !== undefined && v !== null && String(v).trim() !== '') {
+      return String(v).trim();
+    }
+  } catch {
+    /* ignore */
+  }
+  return fallback;
+}
 
-export const SHOPIFY_STORE_DOMAIN = 'royalanci.myshopify.com';
+function viteEnvBool(key, fallback = false) {
+  const v = viteEnv(key);
+  if (v === '') return fallback;
+  return /^(1|true|yes|on)$/i.test(v);
+}
 
-/** Used only when SHOPIFY_CATALOG_SOURCE is `storefront`. Never paste Admin shpat here. */
-export const SHOPIFY_STOREFRONT_ACCESS_TOKEN = '';
+export const SHOPIFY_CATALOG_SOURCE =
+  viteEnv('VITE_SHOPIFY_CATALOG_SOURCE') || 'storefront';
 
-export const SHOPIFY_STOREFRONT_API_VERSION = '2026-04';
+export const SHOPIFY_STORE_DOMAIN =
+  viteEnv('VITE_SHOPIFY_STORE_DOMAIN') || 'royalanci.myshopify.com';
 
-/** Optional: custom storefront URL for product links / cart add (defaults to https://{SHOPIFY_STORE_DOMAIN}). */
-export const SHOPIFY_PUBLIC_STORE_URL = '';
+/** Used when catalog source is `storefront`. Never paste Admin `shpat_` here. */
+export const SHOPIFY_STOREFRONT_ACCESS_TOKEN = viteEnv(
+  'VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN'
+);
 
-/** Optional collection handles (slug from Shopify Admin → Collections). Leave empty to use catalog pagination. */
-export const SHOPIFY_COLLECTION_MAGHREB = '';
-export const SHOPIFY_COLLECTION_OPULENCE = '';
+export const SHOPIFY_STOREFRONT_API_VERSION =
+  viteEnv('VITE_SHOPIFY_API_VERSION') || '2026-04';
 
-export const SHOPIFY_PRODUCTS_PAGE_SIZE = 8;
+/** Optional: custom storefront URL for product links / cart add. */
+export const SHOPIFY_PUBLIC_STORE_URL = viteEnv('VITE_SHOPIFY_PUBLIC_STORE_URL');
 
-/** Log masked token + shop ping in dev tools when true (storefront mode). */
-export const SHOPIFY_DEBUG_LOG = true;
+/** Optional collection handles (slug from Shopify Admin → Collections). */
+export const SHOPIFY_COLLECTION_MAGHREB = viteEnv(
+  'VITE_SHOPIFY_COLLECTION_MAGHREB'
+);
+export const SHOPIFY_COLLECTION_OPULENCE = viteEnv(
+  'VITE_SHOPIFY_COLLECTION_OPULENCE'
+);
+
+const pageSizeRaw = viteEnv('VITE_SHOPIFY_PRODUCTS_PAGE_SIZE');
+export const SHOPIFY_PRODUCTS_PAGE_SIZE = pageSizeRaw
+  ? parseInt(pageSizeRaw, 10) || 8
+  : 8;
+
+export const SHOPIFY_DEBUG_LOG = viteEnvBool('VITE_SHOPIFY_DEBUG', false);

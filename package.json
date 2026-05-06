@@ -7,11 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "start": "node scripts/serve-dist.mjs",
     "admin:create-product": "node server/create-product.mjs",
     "admin:list-products": "node server/list-products.mjs"
   },
   "dependencies": {
-    "gsap": "^3.12.5"
+    "gsap": "^3.12.5",
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "vite": "^5.4.11"

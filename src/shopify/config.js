@@ -1,6 +1,6 @@
 /**
  * Shopify headless config (Storefront API).
- * Values come from ./shopify-settings.js — edit that file (no .env required).
+ * Values come from ./shopify-settings.js (`VITE_*` env at build time + defaults).
  *
  * Admin API tokens (shpat_*) must never be imported in browser code.
  */

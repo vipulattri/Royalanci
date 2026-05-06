@@ -2,10 +2,11 @@ import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 import { vitePluginShopifyCatalog } from './vite-plugin-shopify-catalog.mjs';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   root: '.',
   publicDir: 'public',
-  plugins: [vitePluginShopifyCatalog()],
+  /** Admin catalog proxy only exists when `vite` dev server runs — not on Netlify static deploys. */
+  plugins: mode === 'development' ? [vitePluginShopifyCatalog()] : [],
   /** Allow tunnel hosts (ngrok, etc.) — subdomain changes when tunnel restarts */
   server: {
     allowedHosts: true,
@@ -15,4 +16,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-});
+}));
