@@ -130,3 +130,41 @@ export async function adminFetchRaw(method, pathAndQuery) {
     text,
   };
 }
+
+/**
+ * Generic Admin REST call — same URL shape as Postman (path + query after /admin/api/VERSION/).
+ * @param {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} method
+ * @param {string} pathAndQuery - e.g. `/products.json?limit=5`
+ * @param {object|string|undefined} jsonBody - for POST/PUT/PATCH
+ */
+export async function adminHttpRequest(method, pathAndQuery, jsonBody) {
+  assertAdminConfig();
+  const pq = pathAndQuery.startsWith('/') ? pathAndQuery : `/${pathAndQuery}`;
+  const url = `https://${shopDomain()}/admin/api/${ADMIN_API_VERSION}${pq}`;
+  const m = (method || 'GET').toUpperCase();
+
+  const init = {
+    method: m,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'X-Shopify-Access-Token': adminToken(),
+    },
+  };
+
+  if (['POST', 'PUT', 'PATCH'].includes(m) && jsonBody !== undefined) {
+    init.body =
+      typeof jsonBody === 'string' ? jsonBody : JSON.stringify(jsonBody);
+  }
+
+  const res = await fetch(url, init);
+  const text = await res.text();
+  const linkHeader = res.headers.get('link') || res.headers.get('Link') || '';
+
+  return {
+    status: res.status,
+    text,
+    linkHeader,
+    ok: res.ok,
+  };
+}

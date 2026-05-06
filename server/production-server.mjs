@@ -1,12 +1,15 @@
 /**
- * Production Node server: static `dist/` + `/api/shopify/catalog/*` (Admin REST via catalog-handler).
- * Set SHOPIFY_ADMIN_ACCESS_TOKEN + SHOPIFY_SHOP_DOMAIN in environment (never in client JS).
+ * Production Node server: static `dist/` + Shopify Admin proxies (same URLs as Postman, server adds token).
+ *
+ * - `/api/shopify/admin/*` → `https://{shop}/admin/api/{version}/*` (Postman-equivalent GET; writes optional)
+ * - `/api/shopify/catalog/*` → mapped catalog responses for the storefront UI
  */
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleCatalogRequest } from './catalog-handler.mjs';
+import { handleAdminProxyRequest } from './admin-proxy-forward.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -49,6 +52,11 @@ const server = http.createServer(async (req, res) => {
     const host = req.headers.host || 'localhost';
     const url = new URL(req.url || '/', `http://${host}`);
     const pathname = url.pathname;
+
+    if (pathname.startsWith('/api/shopify/admin')) {
+      await handleAdminProxyRequest(req, res);
+      return;
+    }
 
     if (pathname.startsWith('/api/shopify/catalog')) {
       await handleCatalogRequest(req, res, pathname);
@@ -93,5 +101,7 @@ const server = http.createServer(async (req, res) => {
 
 const port = Number(process.env.PORT) || 4173;
 server.listen(port, '0.0.0.0', () => {
-  console.log(`Royalanci production server — http://0.0.0.0:${port} (static + /api/shopify/catalog)`);
+  console.log(
+    `Royalanci production server — http://0.0.0.0:${port} (static + /api/shopify/admin + /api/shopify/catalog)`
+  );
 });
