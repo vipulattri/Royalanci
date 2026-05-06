@@ -1,8 +1,7 @@
 /**
- * Shopify headless config (Storefront API).
- * Values come from ./shopify-settings.js (`VITE_*` env at build time + defaults).
+ * Shopify client config. Values come from ./shopify-settings.js (`VITE_*` at build time).
  *
- * Admin API tokens (shpat_*) must never be imported in browser code.
+ * Admin API tokens (shpat_*) stay on the server only — never import them in browser code.
  */
 import * as W from './shopify-settings.js';
 
@@ -61,9 +60,9 @@ export function getProductsPageSize() {
   return Number.isFinite(n) && n > 0 ? Math.min(n, 50) : 8;
 }
 
-/** `admin-proxy` = catalog loaded via dev-server Admin REST (same as Postman); no Storefront token needed for grids. */
+/** `admin-proxy` = catalog via your Node server `/api/shopify/catalog/*` + Admin REST (no Storefront token for grids). */
 export function getCatalogSource() {
-  const s = (W.SHOPIFY_CATALOG_SOURCE || 'storefront').trim().toLowerCase();
+  const s = (W.SHOPIFY_CATALOG_SOURCE || 'admin-proxy').trim().toLowerCase();
   return s === 'admin-proxy' ? 'admin-proxy' : 'storefront';
 }
 

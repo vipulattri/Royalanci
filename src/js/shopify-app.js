@@ -325,6 +325,10 @@ function updateCartCount(totalQty) {
 
 async function syncCartBadge() {
   try {
+    if (useLegacyCartCheckout()) {
+      updateCartCount(0);
+      return;
+    }
     if (!getCartId()) {
       updateCartCount(0);
       return;
@@ -501,7 +505,13 @@ function initCartDrawer() {
     cartBtn.setAttribute('aria-expanded', 'false');
   };
 
+  const legacyBase = useLegacyCartCheckout() ? getStorefrontBaseUrl() : '';
+
   cartBtn.addEventListener('click', () => {
+    if (useLegacyCartCheckout() && legacyBase) {
+      window.location.href = `${legacyBase}/cart`;
+      return;
+    }
     if (drawer.hidden) openDrawer();
     else closeDrawer();
   });
@@ -530,6 +540,11 @@ function initAccountModal() {
   };
 
   btn.addEventListener('click', async () => {
+    if (useLegacyCartCheckout()) {
+      const base = getStorefrontBaseUrl();
+      if (base) window.location.href = `${base}/account/login`;
+      return;
+    }
     modal.hidden = false;
     errEl.textContent = '';
     if (getCustomerAccessToken()) {
@@ -674,10 +689,10 @@ export async function initShopifyStorefront() {
     if (banner) {
       banner.hidden = false;
       banner.innerHTML =
-        '<strong>Shopify:</strong> Open <code>src/shopify/shopify-settings.js</code> and set <code>SHOPIFY_STOREFRONT_ACCESS_TOKEN</code> to your <strong>Storefront API</strong> token (Shopify Admin → Apps → your app → Storefront API). Admin tokens (<code>shpat_</code>) cannot be used here.';
+        '<strong>Shopify:</strong> Use <strong>admin-proxy</strong> (default): set <code>SHOPIFY_ADMIN_ACCESS_TOKEN</code> + <code>SHOPIFY_SHOP_DOMAIN</code> on the server (Render env / <code>.env</code>) and run <code>npm start</code>. Or switch to <strong>storefront</strong> mode with <code>VITE_SHOPIFY_CATALOG_SOURCE=storefront</code> and <code>VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN</code> in the build.';
     }
     setAllProductGridsHtml(
-      '<p class="shopify-placeholder">Set your shop domain and Admin token (<code>server/shopify-settings.mjs</code> or <code>.env</code>), then run <code>npm run dev</code> so <code>/api/shopify/catalog</code> can load products.</p>'
+      '<p class="shopify-placeholder">Configure Shopify: Admin token on the server for catalog API, or Storefront token for headless mode. See site banner.</p>'
     );
     initSearchPanel();
     initCartDrawer();

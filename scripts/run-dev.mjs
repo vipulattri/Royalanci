@@ -2,7 +2,7 @@
  * Local: runs Vite dev server.
  *
  * Render sets `RENDER=true`. If the dashboard Start Command is mistakenly still
- * `npm run dev`, we serve the production `dist/` folder on PORT instead (same as `npm start`).
+ * `npm run dev`, we run `server/production-server.mjs` (static + catalog API on PORT).
  */
 import { spawn } from 'node:child_process';
 import path from 'node:path';
@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 if (process.env.RENDER === 'true') {
-  const child = spawn(process.execPath, ['scripts/serve-dist.mjs'], {
+  const child = spawn(process.execPath, ['server/production-server.mjs'], {
     stdio: 'inherit',
     cwd: root,
     env: process.env,

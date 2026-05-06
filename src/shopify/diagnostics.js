@@ -47,7 +47,9 @@ export async function logShopifyConnectionDiagnostics() {
   const domain = getStoreDomain();
 
   if (getCatalogSource() === 'admin-proxy') {
-    console.info('[Royalanci / Shopify] Catalog mode: admin-proxy — products load via Vite dev server (/api/shopify/catalog/*) using Admin API credentials (same as Postman). Storefront GraphQL is not used for grids.');
+    console.info(
+      '[Royalanci / Shopify] Catalog mode: admin-proxy — products load via /api/shopify/catalog/* (Admin REST on the server). No Storefront token needed for product grids. Cart uses your hosted Shopify storefront.'
+    );
     return;
   }
 

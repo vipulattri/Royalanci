@@ -20,7 +20,7 @@ function parseJsonSafe(text) {
 export async function storefrontRequest(query, variables = {}) {
   if (!isShopifyConfigured()) {
     throw new Error(
-      'Shopify is not configured. Edit src/shopify/shopify-settings.js — set SHOPIFY_STORE_DOMAIN and SHOPIFY_STOREFRONT_ACCESS_TOKEN'
+      'Shopify Storefront is not configured. Either use admin-proxy catalog mode (no Storefront token for grids) or set VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN for storefront mode.'
     );
   }
 

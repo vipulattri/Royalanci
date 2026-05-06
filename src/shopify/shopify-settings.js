@@ -1,14 +1,10 @@
 /**
- * Site configuration.
+ * Site configuration (client bundle — never put Admin `shpat_` tokens here).
  *
- * Netlify / production: set `VITE_*` variables in Netlify → Site configuration → Environment variables,
- * then trigger a new deploy. Values are inlined at build time by Vite.
- *
- * Local: copy `.env.example` to `.env` (never commit `.env`).
- *
- * SHOPIFY_CATALOG_SOURCE (via `VITE_SHOPIFY_CATALOG_SOURCE`):
- * - `storefront` (default) — Storefront GraphQL in the browser. Requires `VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN`.
- * - `admin-proxy` — Local only with `npm run dev`; Vite serves `/api/shopify/catalog/*`. Static hosts have no proxy.
+ * Catalog mode `VITE_SHOPIFY_CATALOG_SOURCE`:
+ * - `admin-proxy` (default) — Browser calls `/api/shopify/catalog/*`; your **Node** server
+ *   (Render `npm start`, or `npm run dev` + Vite) uses Admin API with `SHOPIFY_ADMIN_ACCESS_TOKEN` in env.
+ * - `storefront` — Browser calls Shopify Storefront GraphQL; requires `VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN`.
  */
 function viteEnv(key, fallback = '') {
   try {
@@ -29,12 +25,12 @@ function viteEnvBool(key, fallback = false) {
 }
 
 export const SHOPIFY_CATALOG_SOURCE =
-  viteEnv('VITE_SHOPIFY_CATALOG_SOURCE') || 'storefront';
+  viteEnv('VITE_SHOPIFY_CATALOG_SOURCE') || 'admin-proxy';
 
 export const SHOPIFY_STORE_DOMAIN =
   viteEnv('VITE_SHOPIFY_STORE_DOMAIN') || 'royalanci.myshopify.com';
 
-/** Used when catalog source is `storefront`. Never paste Admin `shpat_` here. */
+/** Only for `storefront` catalog mode — Storefront API token, not Admin `shpat_`. */
 export const SHOPIFY_STOREFRONT_ACCESS_TOKEN = viteEnv(
   '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'
 );
