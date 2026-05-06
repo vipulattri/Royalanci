@@ -36,7 +36,7 @@ export const SHOPIFY_STORE_DOMAIN =
 
 /** Used when catalog source is `storefront`. Never paste Admin `shpat_` here. */
 export const SHOPIFY_STOREFRONT_ACCESS_TOKEN = viteEnv(
-  'VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN'
+  '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'
 );
 
 export const SHOPIFY_STOREFRONT_API_VERSION =
