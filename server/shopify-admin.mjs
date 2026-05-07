@@ -52,7 +52,7 @@ export const ADMIN_API_VERSION =
 export function assertAdminConfig() {
   if (!shopDomain() || !adminToken()) {
     throw new Error(
-      'Missing Admin credentials: set SHOPIFY_SHOP_DOMAIN and SHOPIFY_ADMIN_ACCESS_TOKEN in server/shopify-settings.mjs or .env'
+      'Missing Admin API credentials. Match Postman: set SHOPIFY_ADMIN_ACCESS_TOKEN (and optionally SHOPIFY_SHOP_DOMAIN) in .env, or on Render: Environment → same variable names. Never commit tokens to git.'
     );
   }
 }
@@ -62,6 +62,18 @@ export function assertAdminConfig() {
  * @param {string} path - e.g. '/products.json' or 'products.json'
  * @param {object} [jsonBody] - body for POST/PUT
  */
+function adminHeaders(method, withJsonBody) {
+  const m = (method || 'GET').toUpperCase();
+  const h = {
+    Accept: 'application/json',
+    'X-Shopify-Access-Token': adminToken(),
+  };
+  if (withJsonBody || ['POST', 'PUT', 'PATCH'].includes(m)) {
+    h['Content-Type'] = 'application/json';
+  }
+  return h;
+}
+
 export async function adminRest(method, path, jsonBody) {
   assertAdminConfig();
   const p = path.startsWith('/') ? path : `/${path}`;
@@ -69,11 +81,7 @@ export async function adminRest(method, path, jsonBody) {
 
   const res = await fetch(url, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'X-Shopify-Access-Token': adminToken(),
-    },
+    headers: adminHeaders(method, jsonBody != null),
     body: jsonBody != null ? JSON.stringify(jsonBody) : undefined,
   });
 
@@ -103,13 +111,11 @@ export async function adminFetchRaw(method, pathAndQuery) {
   const p = pathAndQuery.startsWith('/') ? pathAndQuery : `/${pathAndQuery}`;
   const url = `https://${shopDomain()}/admin/api/${ADMIN_API_VERSION}${p}`;
 
+  const m = (method || 'GET').toUpperCase();
   const res = await fetch(url, {
-    method,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-Shopify-Access-Token': adminToken(),
-    },
+    method: m,
+    // Postman-style GET: no body, no Content-Type (only Accept + access token)
+    headers: adminHeaders(m, false),
   });
 
   const text = await res.text();
@@ -143,16 +149,15 @@ export async function adminHttpRequest(method, pathAndQuery, jsonBody) {
   const url = `https://${shopDomain()}/admin/api/${ADMIN_API_VERSION}${pq}`;
   const m = (method || 'GET').toUpperCase();
 
+  const hasBody =
+    ['POST', 'PUT', 'PATCH'].includes(m) && jsonBody !== undefined;
+
   const init = {
     method: m,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-Shopify-Access-Token': adminToken(),
-    },
+    headers: adminHeaders(m, hasBody),
   };
 
-  if (['POST', 'PUT', 'PATCH'].includes(m) && jsonBody !== undefined) {
+  if (hasBody) {
     init.body =
       typeof jsonBody === 'string' ? jsonBody : JSON.stringify(jsonBody);
   }
