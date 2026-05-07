@@ -4,6 +4,21 @@
 import { adminRest, adminFetchRaw } from './shopify-admin.mjs';
 import { mapAdminProductToUiShape } from './map-admin-product.mjs';
 
+/** Human-readable message when Shopify returns 401 / invalid token (especially on Render). */
+function describeAdminAuthFailure(status, data, rawText) {
+  const parts = [];
+  if (typeof data?.errors === 'string') parts.push(data.errors);
+  if (typeof data?.error === 'string') parts.push(data.error);
+  if (Array.isArray(data?.errors)) parts.push(data.errors.map(String).join('; '));
+  const blob = [...parts, rawText || ''].join(' ');
+  if (/invalid api key|access token|wrong password|unrecognized login/i.test(blob)) {
+    return (
+      'Shopify rejected the Admin API token. On Render: Web Service → Environment → set SHOPIFY_ADMIN_ACCESS_TOKEN to your current Admin token (Shopify Admin → Apps → your app → API credentials — same as Postman X-Shopify-Access-Token). Save and redeploy. Must not use VITE_ prefix.'
+    );
+  }
+  return parts.filter(Boolean)[0] || rawText?.slice(0, 500) || `Admin API error (${status})`;
+}
+
 let cachedCurrency = '';
 
 async function getShopCurrency() {
@@ -49,13 +64,17 @@ export async function handleCatalogRequest(req, res, pathname) {
       const qs = new URLSearchParams({ limit: String(limit) });
       if (pageInfo) qs.set('page_info', pageInfo);
 
-      const { ok, status, data, linkHeader } = await adminFetchRaw(
+      const { ok, status, data, linkHeader, text } = await adminFetchRaw(
         'GET',
         `/products.json?${qs}`
       );
       if (!ok) {
         res.statusCode = status;
-        res.end(JSON.stringify({ error: data?.errors || data || 'Admin request failed' }));
+        res.end(
+          JSON.stringify({
+            error: describeAdminAuthFailure(status, data, text),
+          })
+        );
         return;
       }
 
@@ -117,14 +136,18 @@ export async function handleCatalogRequest(req, res, pathname) {
       });
       if (pageInfo) qs.set('page_info', pageInfo);
 
-      const { ok, status, data, linkHeader } = await adminFetchRaw(
+      const { ok, status, data, linkHeader, text } = await adminFetchRaw(
         'GET',
         `/products.json?${qs}`
       );
 
       if (!ok) {
         res.statusCode = status;
-        res.end(JSON.stringify({ error: data?.errors || data || 'Admin request failed' }));
+        res.end(
+          JSON.stringify({
+            error: describeAdminAuthFailure(status, data, text),
+          })
+        );
         return;
       }
 

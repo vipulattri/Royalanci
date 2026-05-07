@@ -15,6 +15,16 @@ import {
 const CART_STORAGE_KEY = 'royalanci_shopify_cart_id';
 const CUSTOMER_TOKEN_KEY = 'royalanci_shopify_customer_token';
 
+function catalogFetchErrorMessage(status, text) {
+  try {
+    const j = JSON.parse(text);
+    if (typeof j?.error === 'string') return j.error;
+  } catch {
+    /* ignore */
+  }
+  return (text && text.slice(0, 500)) || `Request failed (HTTP ${status})`;
+}
+
 export function getCartId() {
   try {
     return localStorage.getItem(CART_STORAGE_KEY) || '';
@@ -68,7 +78,7 @@ export async function fetchCollectionProducts(handle, first, after = null) {
     if (after) params.set('page_info', after);
     const res = await fetch(`/api/shopify/catalog/collection?${params}`);
     const text = await res.text();
-    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    if (!res.ok) throw new Error(catalogFetchErrorMessage(res.status, text));
     return JSON.parse(text);
   }
 
@@ -103,7 +113,7 @@ export async function fetchProductsPaginated(first, after = null) {
     if (after) params.set('page_info', after);
     const res = await fetch(`/api/shopify/catalog/products?${params}`);
     const text = await res.text();
-    if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+    if (!res.ok) throw new Error(catalogFetchErrorMessage(res.status, text));
     return JSON.parse(text);
   }
 

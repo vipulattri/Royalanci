@@ -31,10 +31,33 @@ function loadEnvFromRoot() {
 
 loadEnvFromRoot();
 
+/** Trim quotes/BOM — fixes Render paste mistakes. */
+function normalizeCredential(raw) {
+  if (raw == null) return '';
+  let s = String(raw).trim();
+  if (s.charCodeAt(0) === 0xfeff) s = s.slice(1).trim();
+  if (
+    (s.startsWith('"') && s.endsWith('"')) ||
+    (s.startsWith("'") && s.endsWith("'"))
+  ) {
+    s = s.slice(1, -1).trim();
+  }
+  return s;
+}
+
+/**
+ * On Render (`RENDER=true`) or production builds, **environment variables win** over inline file values,
+ * so `SHOPIFY_ADMIN_ACCESS_TOKEN` in the dashboard is always used when set.
+ */
 function pickInlineOrEnv(inline, envKey) {
-  const i = typeof inline === 'string' ? inline.trim() : '';
-  if (i) return i;
-  return process.env[envKey]?.trim() || '';
+  const envVal = normalizeCredential(process.env[envKey]);
+  const inlineVal = normalizeCredential(typeof inline === 'string' ? inline : '');
+  const prodLike =
+    process.env.RENDER === 'true' || process.env.NODE_ENV === 'production';
+  if (prodLike) {
+    return envVal || inlineVal;
+  }
+  return inlineVal || envVal;
 }
 
 function shopDomain() {
