@@ -26,6 +26,9 @@ export function initAnimations(gsap) {
         clearProps: 'transform',
       }
     );
+    gsap.set('.hero-photo-wrap', { clipPath: 'inset(0%)' });
+    gsap.set('.hero-photo-scale', { scale: 1 });
+    gsap.set('.hero-photo', { yPercent: 0 });
     return;
   }
 
@@ -67,7 +70,68 @@ function splitTitleIntoWords(container) {
   });
 }
 
+function initHeroPhoto(gsap) {
+  const wrap = document.querySelector('.hero-photo-wrap');
+  const scaleEl = document.querySelector('.hero-photo-scale');
+  const img = document.querySelector('.hero-photo');
+  const hero = document.querySelector('.hero');
+  if (!wrap || !scaleEl || !img) return;
+
+  gsap.set(wrap, { clipPath: 'inset(100% 0 0 0)' });
+  gsap.set(scaleEl, { scale: 1.14 });
+  gsap.set(img, { yPercent: 6 });
+
+  gsap
+    .timeline({ defaults: { ease: 'power4.inOut' } })
+    .to(wrap, {
+      clipPath: 'inset(0% 0 0 0)',
+      duration: 1.45,
+    })
+    .to(
+      scaleEl,
+      {
+        scale: 1,
+        duration: 2.15,
+        ease: 'power3.out',
+      },
+      '-=1.08'
+    )
+    .to(
+      img,
+      {
+        yPercent: 0,
+        duration: 2,
+        ease: 'power3.out',
+      },
+      '-=1.75'
+    );
+
+  gsap.to(scaleEl, {
+    scale: 1.07,
+    duration: 24,
+    repeat: -1,
+    yoyo: true,
+    ease: 'sine.inOut',
+    delay: 2.4,
+  });
+
+  if (hero) {
+    gsap.to(wrap, {
+      yPercent: 12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: hero,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+      },
+    });
+  }
+}
+
 function heroAnimation(gsap) {
+  initHeroPhoto(gsap);
+
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
   tl.to('.hero-title-line', {
