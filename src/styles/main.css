@@ -1374,7 +1374,7 @@ button {
   width: 100%;
 }
 
-/* Entry promo — code surprise gift (session: hide after dismiss) */
+/* Entry promo — Buy 2 offer (session: hide after dismiss) */
 .promo-popup {
   position: fixed;
   inset: 0;
@@ -1442,43 +1442,16 @@ button {
   color: var(--text-muted);
 }
 
-.promo-popup-code {
-  display: inline-block;
-  margin: 0 0.15rem;
-  padding: 0.15rem 0.5rem;
-  font-family: ui-monospace, 'Cascadia Code', monospace;
-  font-size: 0.9em;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--gold);
-  background: rgba(201, 169, 98, 0.1);
-  border: 1px solid var(--gold-dim);
-  border-radius: var(--radius);
-}
-
 .promo-popup-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  align-items: center;
+  align-items: stretch;
 }
 
-.promo-popup-actions .btn-primary,
-.promo-popup-actions .btn-outline {
-  flex: 1;
-  min-width: 8rem;
+.promo-popup-actions .btn-primary {
+  width: 100%;
   justify-content: center;
-}
-
-.promo-popup-copy-feedback {
-  margin: 0.75rem 0 0;
-  font-size: 0.8125rem;
-  color: var(--gold);
-}
-
-.promo-popup-copy[data-copied] {
-  border-color: var(--gold);
-  color: var(--gold);
 }
 
 .account-modal {
