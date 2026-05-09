@@ -39,6 +39,11 @@ function parseNextPageInfo(linkHeader) {
   return m ? decodeURIComponent(m[1]) : null;
 }
 
+/** Admin REST can return `draft`, `archived`, `active`, `unlisted`, etc. Hide unlisted from the headless storefront. */
+function isPublicCatalogProduct(p) {
+  return String(p?.status || '').toLowerCase() !== 'unlisted';
+}
+
 /**
  * @param {import('node:http').IncomingMessage} req
  * @param {import('node:http').ServerResponse} res
@@ -78,7 +83,7 @@ export async function handleCatalogRequest(req, res, pathname) {
         return;
       }
 
-      const rawList = data?.products || [];
+      const rawList = (data?.products || []).filter(isPublicCatalogProduct);
       const products = rawList.map((p) => mapAdminProductToUiShape(p, currency));
       const nextCursor = parseNextPageInfo(linkHeader);
 
@@ -151,7 +156,7 @@ export async function handleCatalogRequest(req, res, pathname) {
         return;
       }
 
-      const rawList = data?.products || [];
+      const rawList = (data?.products || []).filter(isPublicCatalogProduct);
       const products = rawList.map((p) => mapAdminProductToUiShape(p, currency));
       const nextCursor = parseNextPageInfo(linkHeader);
 
