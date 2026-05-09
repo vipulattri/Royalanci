@@ -1374,6 +1374,113 @@ button {
   width: 100%;
 }
 
+/* Entry promo — code surprise gift (session: hide after dismiss) */
+.promo-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 2300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  pointer-events: none;
+}
+
+.promo-popup[hidden] {
+  display: none;
+}
+
+.promo-popup-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+}
+
+.promo-popup-panel {
+  position: relative;
+  z-index: 1;
+  width: min(400px, 100%);
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 1.5rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 0 0 1px rgba(201, 169, 98, 0.12),
+    0 24px 64px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+.promo-popup-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+}
+
+.promo-popup-eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.promo-popup-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.promo-popup-text {
+  margin: 0 0 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.promo-popup-code {
+  display: inline-block;
+  margin: 0 0.15rem;
+  padding: 0.15rem 0.5rem;
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  background: rgba(201, 169, 98, 0.1);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+}
+
+.promo-popup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.promo-popup-actions .btn-primary,
+.promo-popup-actions .btn-outline {
+  flex: 1;
+  min-width: 8rem;
+  justify-content: center;
+}
+
+.promo-popup-copy-feedback {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--gold);
+}
+
+.promo-popup-copy[data-copied] {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
 .account-modal {
   position: fixed;
   inset: 0;

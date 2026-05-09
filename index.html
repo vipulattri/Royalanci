@@ -306,6 +306,30 @@
       </div>
     </aside>
 
+    <div
+      id="promo-popup"
+      class="promo-popup"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="promo-popup-title"
+    >
+      <div class="promo-popup-backdrop" aria-hidden="true"></div>
+      <div class="promo-popup-panel">
+        <button type="button" class="icon-btn promo-popup-close" aria-label="Close offer">×</button>
+        <p class="promo-popup-eyebrow">Royalanci</p>
+        <h2 id="promo-popup-title" class="promo-popup-title">Your surprise gift</h2>
+        <p class="promo-popup-text">
+          Use code <span class="promo-popup-code">royalgift</span> at checkout to unlock your surprise gift.
+        </p>
+        <div class="promo-popup-actions">
+          <button type="button" class="btn-outline promo-popup-copy">Copy code</button>
+          <button type="button" class="btn-primary promo-popup-dismiss">Continue shopping</button>
+        </div>
+        <p class="promo-popup-copy-feedback" role="status" aria-live="polite" hidden></p>
+      </div>
+    </div>
+
     <div id="account-modal" class="account-modal" hidden role="dialog" aria-modal="true" aria-labelledby="account-modal-title">
       <div class="account-modal-backdrop"></div>
       <div class="account-modal-panel">
