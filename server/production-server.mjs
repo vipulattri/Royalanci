@@ -53,6 +53,14 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url || '/', `http://${host}`);
     const pathname = url.pathname;
 
+    // Some domain forwarders append /lander; canonicalize to root.
+    if (pathname === '/lander' || pathname.startsWith('/lander/')) {
+      res.statusCode = 301;
+      res.setHeader('Location', `/${url.search || ''}`);
+      res.end();
+      return;
+    }
+
     if (pathname.startsWith('/api/shopify/admin')) {
       await handleAdminProxyRequest(req, res);
       return;
