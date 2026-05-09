@@ -39,9 +39,19 @@ function parseNextPageInfo(linkHeader) {
   return m ? decodeURIComponent(m[1]) : null;
 }
 
-/** Admin REST can return `draft`, `archived`, `active`, `unlisted`, etc. Hide unlisted from the headless storefront. */
+function productUsesGiftCardFulfillment(p) {
+  const variants = p?.variants;
+  if (!Array.isArray(variants)) return false;
+  return variants.some(
+    (v) => String(v?.fulfillment_service || '').toLowerCase() === 'gift_card'
+  );
+}
+
+/** Admin REST can return `draft`, `archived`, `active`, `unlisted`, etc. Hide unlisted + gift-card SKUs from the headless storefront. */
 function isPublicCatalogProduct(p) {
-  return String(p?.status || '').toLowerCase() !== 'unlisted';
+  if (String(p?.status || '').toLowerCase() === 'unlisted') return false;
+  if (productUsesGiftCardFulfillment(p)) return false;
+  return true;
 }
 
 /**
