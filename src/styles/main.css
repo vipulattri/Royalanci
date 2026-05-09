@@ -84,20 +84,18 @@ button {
   top: 1rem;
 }
 
-/* Header */
+/* Header — solid bar so hero imagery does not read through behind the nav */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(10, 9, 8, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.35s var(--ease-out-expo), background 0.35s;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo);
 }
 
 .site-header.is-scrolled {
-  border-bottom-color: var(--border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
 .header-inner {
